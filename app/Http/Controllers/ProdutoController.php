@@ -37,7 +37,18 @@ class ProdutoController extends Controller
      */
     public function show(Produto $produto)
     {
-        //
+        try {
+            $produto = Produto::findOrFail($produto->id);
+            return response()->json([
+                'message' => 'Produto encontrado com sucesso',
+                'data' => $produto
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Produto não encontrado',
+                'error' => $e->getMessage()
+            ], Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
