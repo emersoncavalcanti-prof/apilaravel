@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Produto;
 use App\Http\Requests\StoreProdutoRequest;
 use App\Http\Requests\UpdateProdutoRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
 
 class ProdutoController extends Controller
@@ -56,14 +57,54 @@ class ProdutoController extends Controller
      */
     public function update(UpdateProdutoRequest $request, Produto $produto)
     {
-        //
+        $data = $request->all();
+
+        $produto = Produto::find($produto->id);
+
+        if(!$produto){
+            return response()->json([
+                'message' => 'Produto não encontrado',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $response = $produto->update($data);
+
+        if(!$response){
+            return response()->json([
+                'message' => 'Erro ao atualizar o produto',
+            ], Response::HTTP_BAD_REQUEST);
+        }else{
+            return response()->json([
+                'message' => 'Produto atualizado com sucesso',
+                'data' => $produto
+            ], Response::HTTP_OK);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Produto $produto)
+    public function destroy($id)
     {
-        //
+        try{
+            $produto = Produto::findOrFail($id);
+            $produto->delete();
+
+            return response()->json([
+                'message' => 'Produto deletado com sucesso',
+            ], Response::HTTP_OK);
+
+        }catch(ModelNotFoundException $e){
+            return response()->json([
+                'message' => 'Produto não encontrado',
+                'error' => $e->getMessage()
+            ], Response::HTTP_NOT_FOUND);
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'message' => 'Produto não encontrado',
+                'error' => $e->getMessage()
+            ], Response::HTTP_NOT_FOUND);
+        }
     }
 }
