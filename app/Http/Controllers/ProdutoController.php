@@ -55,11 +55,11 @@ class ProdutoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProdutoRequest $request, Produto $produto)
+    public function update(UpdateProdutoRequest $request,$id)
     {
         $data = $request->all();
 
-        $produto = Produto::find($produto->id);
+        $produto = Produto::find($id);
 
         if(!$produto){
             return response()->json([
